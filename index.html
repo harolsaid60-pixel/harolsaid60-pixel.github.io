@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ReportFlow — Gestión de reportes y asistencia</title>
+  <meta name="description" content="La plataforma de gestión de reportes diarios y asistencia diseñada para adaptarse a cualquier empresa."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; background: #fff; line-height: 1.6; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e8e8e8; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; color: #1565C0; text-decoration: none; }
+    .nav-logo svg { width: 32px; height: 32px; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { text-decoration: none; color: #555; font-size: 14px; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: #1565C0; }
+    .nav-cta { background: #1565C0; color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; }
+    .nav-cta:hover { background: #0d47a1; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { width: 22px; height: 2px; background: #333; border-radius: 2px; display: block; }
+    .mobile-menu { display: none; background: #fff; border-bottom: 1px solid #e8e8e8; padding: 16px 32px; flex-direction: column; gap: 14px; }
+    .mobile-menu a { text-decoration: none; color: #555; font-size: 15px; font-weight: 500; }
+    .mobile-menu.open { display: flex; }
+
+    /* HERO */
+    .hero { background: #1565C0; padding: 88px 32px 100px; text-align: center; position: relative; overflow: hidden; }
+    .hero-bg-circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
+    .hero-logo-box { width: 80px; height: 80px; background: #fff; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; }
+    .hero h1 { font-size: 48px; font-weight: 700; color: #fff; margin-bottom: 18px; line-height: 1.15; }
+    .hero h1 span { color: #90CAF9; }
+    .hero p { font-size: 19px; color: rgba(255,255,255,0.8); max-width: 580px; margin: 0 auto 40px; }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .btn-white { background: #fff; color: #1565C0; border: none; padding: 15px 32px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity .2s; }
+    .btn-white:hover { opacity: .9; }
+    .btn-outline { background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.35); padding: 15px 32px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s; }
+    .btn-outline:hover { background: rgba(255,255,255,0.2); }
+    .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.2); padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+
+    /* SECTIONS */
+    section { padding: 80px 32px; }
+    .container { max-width: 980px; margin: 0 auto; }
+    .section-label { font-size: 12px; font-weight: 600; color: #1565C0; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-size: 32px; font-weight: 700; color: #111; margin-bottom: 14px; line-height: 1.25; }
+    .section-sub { font-size: 17px; color: #555; max-width: 580px; line-height: 1.7; }
+    .divider { border: none; border-top: 1px solid #f0f0f0; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 48px; }
+    .feat-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 28px; transition: border-color .2s, transform .2s; }
+    .feat-card:hover { border-color: #90CAF9; transform: translateY(-2px); }
+    .feat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+    .feat-icon svg { width: 24px; height: 24px; }
+    .feat-title { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 8px; }
+    .feat-desc { font-size: 14px; color: #666; line-height: 1.65; }
+
+    /* STATS */
+    .stats-bg { background: #f8f9ff; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-top: 48px; }
+    .stat-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 28px 20px; text-align: center; }
+    .stat-num { font-size: 40px; font-weight: 700; color: #1565C0; margin-bottom: 6px; }
+    .stat-label { font-size: 14px; color: #666; }
+
+    /* STEPS */
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; margin-top: 48px; position: relative; }
+    .step { position: relative; }
+    .step-num { width: 40px; height: 40px; background: #E3F2FD; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #1565C0; margin-bottom: 16px; }
+    .step-title { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 8px; }
+    .step-desc { font-size: 14px; color: #666; line-height: 1.65; }
+
+    /* ROLES */
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; margin-top: 48px; }
+    .role-card { border-radius: 16px; padding: 28px; }
+    .role-card.r1 { background: #EDE9FD; border: 1px solid #C4B5F4; }
+    .role-card.r2 { background: #E3F2FD; border: 1px solid #90CAF9; }
+    .role-card.r3 { background: #E0F2F1; border: 1px solid #80CBC4; }
+    .role-card.r4 { background: #E8F5E9; border: 1px solid #A5D6A7; }
+    .role-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .r1 .role-name { color: #4527A0; }
+    .r2 .role-name { color: #0D47A1; }
+    .r3 .role-name { color: #00695C; }
+    .r4 .role-name { color: #1B5E20; }
+    .role-desc { font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+    .r1 .role-desc { color: #5E35B1; }
+    .r2 .role-desc { color: #1565C0; }
+    .r3 .role-desc { color: #00796B; }
+    .r4 .role-desc { color: #2E7D32; }
+    .role-perms { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .role-perm { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+    .perm-check { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .perm-check.ok { background: #1565C0; }
+    .perm-check.no { background: #ccc; }
+    .r1 .perm-check.ok { background: #5E35B1; }
+    .r3 .perm-check.ok { background: #00796B; }
+    .r4 .perm-check.ok { background: #2E7D32; }
+    .r1 .role-perm { color: #4527A0; }
+    .r2 .role-perm { color: #0D47A1; }
+    .r3 .role-perm { color: #00695C; }
+    .r4 .role-perm { color: #1B5E20; }
+
+    /* DRIVE */
+    .drive-bg { background: #f8f9ff; }
+    .drive-box { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 36px; margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .drive-label { font-size: 12px; font-weight: 600; color: #999; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+    .drive-tree { font-size: 13px; font-family: 'SF Mono', 'Courier New', monospace; color: #666; line-height: 2.1; }
+    .drive-tree .folder { color: #1565C0; font-weight: 600; }
+    .drive-modes { display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+    .drive-mode { background: #f8f9ff; border: 1px solid #e8eeff; border-radius: 12px; padding: 18px 20px; }
+    .drive-mode-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .drive-mode-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .drive-mode-name { font-size: 14px; font-weight: 600; color: #111; }
+    .drive-mode-desc { font-size: 13px; color: #666; line-height: 1.6; }
+    .drive-tip { background: #E3F2FD; border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
+    .drive-tip-title { font-size: 12px; font-weight: 600; color: #0D47A1; margin-bottom: 4px; }
+    .drive-tip-desc { font-size: 12px; color: #1565C0; line-height: 1.5; }
+
+    /* SECURITY */
+    .security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 48px; }
+    .sec-item { background: #f8f9ff; border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+    .sec-icon { width: 36px; height: 36px; background: #E3F2FD; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sec-icon svg { width: 18px; height: 18px; }
+    .sec-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 4px; }
+    .sec-desc { font-size: 13px; color: #666; line-height: 1.55; }
+
+    /* UPDATE FLOW */
+    .update-flow { display: flex; align-items: center; gap: 10px; margin-top: 48px; flex-wrap: wrap; justify-content: center; }
+    .uf-step { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px 18px; text-align: center; flex: 1; min-width: 110px; }
+    .uf-step.last { border-color: #A5D6A7; background: #E8F5E9; }
+    .uf-num { font-size: 11px; font-weight: 600; color: #1565C0; margin-bottom: 6px; }
+    .uf-step.last .uf-num { color: #2E7D32; }
+    .uf-label { font-size: 13px; font-weight: 600; color: #111; }
+    .uf-step.last .uf-label { color: #1B5E20; }
+    .uf-arrow { color: #ccc; font-size: 20px; flex-shrink: 0; }
+
+    /* CONTACT */
+    .contact-bg { background: #f8f9ff; }
+    .contact-top { background: #1565C0; border-radius: 20px; padding: 48px 44px; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; margin-bottom: 28px; }
+    .contact-top h2 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.3; }
+    .contact-top p { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.65; max-width: 440px; }
+    .contact-right { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+    .avail-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 7px 16px; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .green-dot { width: 8px; height: 8px; border-radius: 50%; background: #69F0AE; }
+    .resp-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px 20px; text-align: right; }
+    .resp-label { font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+    .resp-val { font-size: 18px; font-weight: 700; color: #fff; }
+    .contact-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .cc { border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+    .cc.wa { background: #E0F2F1; border: 1px solid #80CBC4; }
+    .cc.ig { background: #FBE9E7; border: 1px solid #FFAB91; }
+    .cc-head { display: flex; align-items: center; gap: 14px; }
+    .cc-icon { width: 54px; height: 54px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cc-icon.wa { background: #00897B; }
+    .cc-icon.ig { background: #E64A19; }
+    .cc-title { font-size: 18px; font-weight: 700; }
+    .cc.wa .cc-title { color: #004D40; }
+    .cc.ig .cc-title { color: #BF360C; }
+    .cc-handle { font-size: 14px; margin-top: 2px; }
+    .cc.wa .cc-handle { color: #00695C; }
+    .cc.ig .cc-handle { color: #D84315; }
+    .cc-body { font-size: 14px; line-height: 1.65; }
+    .cc.wa .cc-body { color: #00695C; }
+    .cc.ig .cc-body { color: #BF360C; }
+    .cc-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: 11px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: opacity .2s; }
+    .cc-btn:hover { opacity: .88; }
+    .cc-btn.wa { background: #00897B; color: #fff; }
+    .cc-btn.ig { background: #E64A19; color: #fff; }
+    .includes { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 28px 32px; }
+    .includes-title { font-size: 15px; font-weight: 600; color: #111; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .includes-title svg { width: 20px; height: 20px; }
+    .inc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .inc-item { display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; background: #f8f9ff; border-radius: 10px; }
+    .inc-dot { width: 8px; height: 8px; border-radius: 50%; background: #1565C0; margin-top: 5px; flex-shrink: 0; }
+    .inc-text { font-size: 13px; color: #555; line-height: 1.55; }
+    .inc-text b { font-weight: 600; color: #111; display: block; margin-bottom: 2px; }
+
+    /* FOOTER */
+    footer { background: #111; color: #aaa; padding: 36px 32px; text-align: center; }
+    footer .logo-text { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    footer p { font-size: 13px; line-height: 1.6; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 16px; }
+      .section-title { font-size: 24px; }
+      .drive-box { grid-template-columns: 1fr; }
+      .contact-top { grid-template-columns: 1fr; }
+      .contact-right { align-items: flex-start; }
+      .contact-cards { grid-template-columns: 1fr; }
+      .update-flow { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="28" width="8" height="10" rx="2" fill="#1565C0"/>
+      <rect x="16" y="18" width="8" height="20" rx="2" fill="#1565C0"/>
+      <rect x="28" y="8" width="8" height="30" rx="2" fill="#1565C0"/>
+      <path d="M8 20 L20 12 L32 4" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <circle cx="8" cy="20" r="3" fill="#378ADD"/>
+      <circle cx="20" cy="12" r="3" fill="#378ADD"/>
+      <circle cx="32" cy="4" r="3" fill="#378ADD"/>
+    </svg>
+    ReportFlow
+  </a>
+  <ul class="nav-links">
+    <li><a href="#caracteristicas">Características</a></li>
+    <li><a href="#roles">Roles</a></li>
+    <li><a href="#drive">Drive</a></li>
+    <li><a href="#seguridad">Seguridad</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a class="nav-cta" href="https://wa.me/573246077162?text=Hola%2C%20me%20interesa%20ReportFlow" target="_blank">Obtener app</a>
+  <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu">
+  <a href="#caracteristicas">Características</a>
+  <a href="#roles">Roles</a>
+  <a href="#drive">Drive</a>
+  <a href="#seguridad">Seguridad</a>
+  <a href="#contacto">Contacto</a>
+  <a href="https://wa.me/573246077162?text=Hola%2C%20me%20interesa%20ReportFlow" target="_blank" style="color:#1565C0;font-weight:600;">Obtener app</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle" style="width:500px;height:500px;top:-200px;left:-150px;"></div>
+  <div class="hero-bg-circle" style="width:400px;height:400px;bottom:-150px;right:-100px;"></div>
+  <div style="position:relative;">
+    <div class="hero-logo-box">
+      <svg viewBox="0 0 40 40" fill="none" width="48" height="48">
+        <rect x="4" y="28" width="8" height="10" rx="2" fill="#1565C0"/>
+        <rect x="16" y="18" width="8" height="20" rx="2" fill="#1565C0"/>
+        <rect x="28" y="8" width="8" height="30" rx="2" fill="#1565C0"/>
+        <path d="M8 20 L20 12 L32 4" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <circle cx="8" cy="20" r="3" fill="#378ADD"/>
+        <circle cx="20" cy="12" r="3" fill="#378ADD"/>
+        <circle cx="32" cy="4" r="3" fill="#378ADD"/>
+      </svg>
+    </div>
+    <h1>Gestión de reportes<br/><span>simple y poderosa</span></h1>
+    <p>La plataforma que centraliza el control de asistencia y reportes diarios de tu empresa en una sola app móvil, adaptable a cualquier industria.</p>
+    <div class="hero-btns">
+      <a class="btn-white" href="https://wa.me/573246077162?text=Hola%2C%20me%20interesa%20ReportFlow" target="_blank">Quiero ReportFlow</a>
+      <a class="btn-outline" href="#caracteristicas">Ver características</a>
+    </div>
+    <div class="badge-row">
+      <span class="badge">Reportes personalizables</span>
+      <span class="badge">Control de asistencia QR</span>
+      <span class="badge">Google Drive integrado</span>
+      <span class="badge">Reconocimiento de voz</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="caracteristicas">
+  <div class="container">
+    <div class="section-label">Características principales</div>
+    <div class="section-title">Todo lo que tu empresa necesita</div>
+    <p class="section-sub">Desde el registro de asistencia hasta la exportación de reportes, ReportFlow centraliza la gestión operativa en una sola app.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#E3F2FD;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="4" x2="9" y2="9"/></svg>
+        </div>
+        <div class="feat-title">Reportes del día personalizables</div>
+        <p class="feat-desc">El administrador define qué campos aparecen en cada reporte — texto libre, opciones desplegables, checkboxes, o datos automáticos del sistema.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#E0F2F1;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00796B" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+        </div>
+        <div class="feat-title">Asistencia con QR y geolocalización</div>
+        <p class="feat-desc">El empleado escanea el QR del grupo y el sistema verifica que esté a menos de 100 metros del punto de trabajo. Incluye selfie de entrada y salida.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#EDE9FD;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5E35B1" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="feat-title">Jerarquía de administradores</div>
+        <p class="feat-desc">Admin mayor y admin menor. El mayor crea grupos y asigna admins menores. Cada admin solo ve y gestiona lo que le corresponde.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#E8F5E9;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="feat-title">Reconocimiento de voz continuo</div>
+        <p class="feat-desc">En los campos de texto libre el empleado puede dictar con el micrófono. El reconocimiento no se apaga hasta que vuelva a presionar el botón.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#FFF8E1;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F57F17" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+        </div>
+        <div class="feat-title">Exportación a Excel dinámica</div>
+        <p class="feat-desc">Los reportes y asistencias se exportan a Excel con las columnas exactas que el admin configuró. Selección múltiple por mes para exportar en lote.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#E3F2FD;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div class="feat-title">Actualizaciones automáticas</div>
+        <p class="feat-desc">Al abrir la app se verifica si hay una nueva versión. El usuario descarga e instala sin salir, con barra de progreso en tiempo real.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#FCE4EC;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C62828" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        </div>
+        <div class="feat-title">Borrador sin conexión</div>
+        <p class="feat-desc">Si el empleado pierde la conexión al llenar un reporte, la app guarda un borrador automáticamente y lo recupera cuando vuelve el internet.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#E0F2F1;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00796B" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="feat-title">Multi-grupo para empleados</div>
+        <p class="feat-desc">Un empleado puede pertenecer a varios grupos simultáneamente. Ideal para personas que rotan entre diferentes sitios de trabajo.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#F3E5F5;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7B1FA2" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feat-title">Limpieza automática</div>
+        <p class="feat-desc">Los reportes de más de 4 meses se eliminan automáticamente. Un indicador visual avisa al admin cuando se acerca la fecha de borrado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- STATS -->
+<section class="stats-bg">
+  <div class="container">
+    <div class="section-label">Por qué ReportFlow</div>
+    <div class="section-title">Números que importan</div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">100m</div><div class="stat-label">Radio de verificación de asistencia por QR</div></div>
+      <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Niveles de acceso: SuperAdmin, Admin mayor, Admin menor, Empleado</div></div>
+      <div class="stat-card"><div class="stat-num">∞</div><div class="stat-label">Campos personalizables por reporte</div></div>
+      <div class="stat-card"><div class="stat-num">&lt;24h</div><div class="stat-label">Tiempo de respuesta garantizado</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- STEPS -->
+<section>
+  <div class="container">
+    <div class="section-label">¿Cómo funciona?</div>
+    <div class="section-title">En 4 pasos simples</div>
+    <p class="section-sub">Desde la creación del grupo hasta la exportación de datos, todo el flujo está diseñado para ser intuitivo.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">El admin crea el grupo</div>
+        <p class="step-desc">Se genera un código único que el admin comparte con sus empleados. Personaliza los campos del reporte según las necesidades del trabajo.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Los empleados se unen</div>
+        <p class="step-desc">Ingresan el código en la app y quedan vinculados al grupo. Pueden unirse a varios grupos a la vez si trabajan en diferentes lugares.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Registro diario</div>
+        <p class="step-desc">Cada día los empleados registran su entrada y salida escaneando el QR y tomándose una selfie. También llenan el reporte del día.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">El admin exporta</div>
+        <p class="step-desc">Selecciona los reportes o asistencias por mes y los exporta a Excel, o los envía automáticamente a su Google Drive organizado por año y mes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ROLES -->
+<section id="roles">
+  <div class="container">
+    <div class="section-label">Roles y permisos</div>
+    <div class="section-title">Cada persona ve solo lo que le corresponde</div>
+    <p class="section-sub">ReportFlow tiene 4 niveles de acceso con permisos claramente diferenciados.</p>
+    <div class="roles-grid">
+      <div class="role-card r1">
+        <div class="role-name">SuperAdmin</div>
+        <p class="role-desc">Control total del sistema. Gestiona roles de todos los usuarios.</p>
+        <ul class="role-perms">
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Promover y degradar usuarios</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Elegir tipo de admin</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Acceso global al sistema</li>
+        </ul>
+      </div>
+      <div class="role-card r2">
+        <div class="role-name">Admin mayor</div>
+        <p class="role-desc">Dueño de sus grupos. Gestiona admins menores y toda la configuración.</p>
+        <ul class="role-perms">
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Crear y eliminar grupos</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Asignar/expulsar admins menores</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Personalizar plantilla de reporte</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Vincular Google Drive</li>
+        </ul>
+      </div>
+      <div class="role-card r3">
+        <div class="role-name">Admin menor</div>
+        <p class="role-desc">Gestiona los grupos que le asigna el admin mayor.</p>
+        <ul class="role-perms">
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Ver reportes y asistencias</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Gestionar miembros del grupo</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Configurar QR del grupo</li>
+          <li class="role-perm"><div class="perm-check no"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M3 7L7 3M3 3l4 4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> No puede crear/borrar grupos</li>
+        </ul>
+      </div>
+      <div class="role-card r4">
+        <div class="role-name">Empleado</div>
+        <p class="role-desc">Registra su asistencia y envía reportes diarios desde el celular.</p>
+        <ul class="role-perms">
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Escanear QR de asistencia</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Crear reportes con voz o texto</li>
+          <li class="role-perm"><div class="perm-check ok"><svg width="9" height="9" viewBox="0 0 10 10"><path d="M2 5l2 2.5L8 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div> Unirse a múltiples grupos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- DRIVE -->
+<section id="drive" class="drive-bg">
+  <div class="container">
+    <div class="section-label">Google Drive</div>
+    <div class="section-title">Tus datos, organizados en tu Drive</div>
+    <p class="section-sub">Vincula tu Google Drive personal y elige si exportar manualmente o de forma automática cada mes. Cada grupo tiene su propia carpeta.</p>
+    <div class="drive-box">
+      <div>
+        <div class="drive-label">Estructura de carpetas</div>
+        <div class="drive-tree">
+          <div><span class="folder">📁 ReportFlow</span></div>
+          <div style="padding-left:18px"><span class="folder">📁 Planta Salud</span></div>
+          <div style="padding-left:36px"><span class="folder">📁 Reportes</span></div>
+          <div style="padding-left:54px"><span class="folder">📁 2026</span></div>
+          <div style="padding-left:72px"><span class="folder">📁 Abril</span></div>
+          <div style="padding-left:90px">📊 Reportes_Abril_2026.xlsx</div>
+          <div style="padding-left:36px"><span class="folder">📁 Asistencias</span></div>
+          <div style="padding-left:54px"><span class="folder">📁 2026</span></div>
+          <div style="padding-left:72px"><span class="folder">📁 Marzo</span></div>
+          <div style="padding-left:90px">📊 Asistencias_Marzo_2026.xlsx</div>
+          <div style="padding-left:18px"><span class="folder">📁 Grupo Norte</span></div>
+          <div style="padding-left:36px; color:#aaa">...</div>
+        </div>
+      </div>
+      <div class="drive-modes">
+        <div class="drive-mode">
+          <div class="drive-mode-head"><div class="drive-mode-dot" style="background:#1565C0"></div><div class="drive-mode-name">Modo manual</div></div>
+          <p class="drive-mode-desc">El admin exporta cuando quiere desde la pantalla de reportes o asistencias, presionando el botón "Enviar al Drive".</p>
+        </div>
+        <div class="drive-mode">
+          <div class="drive-mode-head"><div class="drive-mode-dot" style="background:#00897B"></div><div class="drive-mode-name">Modo automático</div></div>
+          <p class="drive-mode-desc">Al abrir la app, se detecta si hay exportaciones pendientes del mes anterior y se suben automáticamente sin ninguna acción del admin.</p>
+        </div>
+        <div class="drive-tip">
+          <div class="drive-tip-title">Configuración por grupo</div>
+          <p class="drive-tip-desc">Cada grupo puede tener su propio modo de exportación independientemente de los demás.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- SECURITY -->
+<section id="seguridad">
+  <div class="container">
+    <div class="section-label">Seguridad</div>
+    <div class="section-title">Tu información, protegida</div>
+    <p class="section-sub">ReportFlow está construido sobre Firebase con reglas de seguridad granulares para cada colección de datos.</p>
+    <div class="security-grid">
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div><div class="sec-title">Reglas de Firestore granulares</div><p class="sec-desc">Cada usuario solo puede leer y modificar sus propios datos. Las reglas validan cada operación.</p></div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        <div><div class="sec-title">Credenciales en Remote Config</div><p class="sec-desc">Las claves de servicios externos no están en el código fuente. Se obtienen de Firebase al iniciar.</p></div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        <div><div class="sec-title">APK ofuscado con ProGuard</div><p class="sec-desc">El código del APK está minificado y ofuscado, haciendo muy difícil la ingeniería inversa.</p></div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><div class="sec-title">Asistencias no borrables</div><p class="sec-desc">Las reglas de Firestore prohíben eliminar registros de asistencia desde la app.</p></div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div><div class="sec-title">SuperAdmin verificado en servidor</div><p class="sec-desc">El rol de superadmin se verifica directamente en Firestore, no desde el cliente.</p></div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div><div class="sec-title">Actualizaciones firmadas</div><p class="sec-desc">Los APK se hospedan en GitHub Releases. La app verifica y descarga solo versiones autorizadas.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- UPDATE FLOW -->
+<section style="background:#f8f9ff;">
+  <div class="container">
+    <div class="section-label">Actualizaciones automáticas</div>
+    <div class="section-title">Siempre en la última versión</div>
+    <p class="section-sub">Cuando hay una nueva versión disponible, la app lo detecta al abrirse y guía al usuario para instalarla sin salir de la aplicación.</p>
+    <div class="update-flow">
+      <div class="uf-step"><div class="uf-num">Paso 1</div><div class="uf-label">App abre</div></div>
+      <div class="uf-arrow">→</div>
+      <div class="uf-step"><div class="uf-num">Paso 2</div><div class="uf-label">Consulta Firestore</div></div>
+      <div class="uf-arrow">→</div>
+      <div class="uf-step"><div class="uf-num">Paso 3</div><div class="uf-label">Diálogo de actualización</div></div>
+      <div class="uf-arrow">→</div>
+      <div class="uf-step"><div class="uf-num">Paso 4</div><div class="uf-label">Descarga con progreso</div></div>
+      <div class="uf-arrow">→</div>
+      <div class="uf-step last"><div class="uf-num">Listo</div><div class="uf-label">Instalación automática</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CONTACT -->
+<section id="contacto" class="contact-bg">
+  <div class="container">
+    <div class="contact-top">
+      <div>
+        <h2>¿Quieres ReportFlow para tu empresa?</h2>
+        <p>Escríbeme por WhatsApp o Instagram. Cuéntame el tamaño de tu empresa y qué necesitas — te respondo rápido y sin compromiso.</p>
+      </div>
+      <div class="contact-right">
+        <div class="avail-badge"><div class="green-dot"></div> Disponible ahora</div>
+        <div class="resp-box">
+          <div class="resp-label">tiempo de respuesta</div>
+          <div class="resp-val">menos de 24h</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-cards">
+      <div class="cc wa">
+        <div class="cc-head">
+          <div class="cc-icon wa">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div>
+            <div class="cc-title">WhatsApp</div>
+            <div class="cc-handle">+57 324 607 7162</div>
+          </div>
+        </div>
+        <p class="cc-body">La forma más rápida de contactarme. Escríbeme directamente, cuéntame sobre tu empresa y te propongo una solución.</p>
+        <a class="cc-btn wa" href="https://wa.me/573246077162?text=Hola%2C%20me%20interesa%20ReportFlow%20para%20mi%20empresa" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Abrir WhatsApp
+        </a>
+      </div>
+
+      <div class="cc ig">
+        <div class="cc-head">
+          <div class="cc-icon ig">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </div>
+          <div>
+            <div class="cc-title">Instagram</div>
+            <div class="cc-handle">@said0_309</div>
+          </div>
+        </div>
+        <p class="cc-body">Sígueme en Instagram para ver novedades de ReportFlow, demos de la app y actualizaciones del proyecto.</p>
+        <a class="cc-btn ig" href="https://www.instagram.com/said0_309?igsh=MTdmdHYzMzlvaWpmYQ==" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Ver Instagram
+        </a>
+      </div>
+    </div>
+
+    <div class="includes">
+      <div class="includes-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        ¿Qué incluye adquirir ReportFlow?
+      </div>
+      <div class="inc-grid">
+        <div class="inc-item"><div class="inc-dot"></div><div class="inc-text"><b>App instalada y configurada</b>Lista para usar desde el primer día, adaptada a tu empresa.</div></div>
+        <div class="inc-item"><div class="inc-dot"></div><div class="inc-text"><b>Capacitación para admins</b>Te explico cómo gestionar grupos, reportes y usuarios.</div></div>
+        <div class="inc-item"><div class="inc-dot"></div><div class="inc-text"><b>Soporte técnico</b>Atención directa ante cualquier problema o duda que surja.</div></div>
+        <div class="inc-item"><div class="inc-dot"></div><div class="inc-text"><b>Actualizaciones futuras</b>Recibes automáticamente todas las mejoras y nuevas funciones.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo-text">ReportFlow</div>
+  <p>Gestión de reportes y asistencia para empresas · Desarrollado en Colombia 🇨🇴</p>
+  <p style="margin-top:8px;">Contacto: <a href="https://wa.me/573246077162" target="_blank" style="color:#90CAF9;">+57 324 607 7162</a> · <a href="https://www.instagram.com/said0_309" target="_blank" style="color:#90CAF9;">@said0_309</a></p>
+</footer>
+
+</body>
+</html>
